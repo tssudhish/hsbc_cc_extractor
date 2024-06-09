@@ -1,10 +1,17 @@
 import pdfreader
 import os
 from pdfreader import PDFDocument, SimplePDFViewer
+import sqlite3
+import pandas as pd
+import re
 
-file_path = os.path.join(os.path.dirname(__file__), "cc", "2024-04-29_Statement.pdf")
-database_path = os.path.join(os.path.dirname(__file__), "expenses.db")
+'''
+Code definitions
+'''
+
+# define a function to extract data from the pdf file
 def extract_data_from_pdf (file_path):
+    print(f"Extracting data from the pdf file {file_path}")
     all_strings = []
     with open(file_path, "rb") as fd:
         doc = PDFDocument(fd)
@@ -22,7 +29,6 @@ def extract_data_from_pdf (file_path):
 def process_data(all_strings):
     combined_strings = " ".join(all_strings)
 
-    import re
     dates = re.findall(r"\d{2} [A-Z][a-z]{2} \d{2}\s\d{2} [A-Z][a-z]{2} \d{2}", combined_strings)
     new_line_patterns = dates +  ["Sheet number", "Summary Of", "Card number", "Your Rewards"]
     for elem in new_line_patterns:
@@ -37,7 +43,6 @@ def process_data(all_strings):
 
 
 def extract_expense(processed_data):
-    import re
     expense_data = []
     # create a databased to store the extracted data
     for line in processed_data.split("\n"):
@@ -64,68 +69,68 @@ def extract_expense(processed_data):
                              "amount" : amount})
     return expense_data
 
+# define a function to create a pandas dataframe from the extracted data
+def create_dataframe(extract_data):
+    df = pd.DataFrame(extract_data)
+    return df
 
-# insert the extracted data into the database
-def insert_data_to_database(name, extract_data):
-    import sqlite3
+# define a function to join the dataframe to an existing dataframe all_data
+def join_dataframes(all_data, df):
+    all_data = pd.concat([all_data, df], ignore_index=True)
+    return all_data
+
+
+
+def cycle_through_files(expenses_dir):
+    all_data = pd.DataFrame()
+    # cycle thorugh all the pdf files in the file_path folder
+    for file_name in os.listdir(expenses_dir):
+        if not file_name.endswith(".pdf"):
+            continue
+        file_path = os.path.join(expenses_dir, file_name)
+        # extract the name  from the file_name without the extension
+        name = os.path.splitext(file_name)[0]
+        all_strings = extract_data_from_pdf(file_path)        
+        processed_data = process_data(all_strings)
+        extract_data = extract_expense( processed_data)
+        df = create_dataframe(extract_data)
+        # add the name column to the dataframe df
+        df["name"] = name
+        all_data = join_dataframes(all_data, df)
+    return all_data
+
+def store_data_in_database(all_data, database_path):
     conn = sqlite3.connect(database_path)
-    cursor = conn.cursor()
-    # delete existing table
-    cursor.execute("DROP TABLE IF EXISTS expenses")
-    # create a table to store the extracted data with posting date, purchaase date, description and amount
-    # add a unique id for each row
-
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS expenses (
-        expense_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        file_name TEXT,
-        posting_date DATE, 
-        purchase_date DATE, 
-        description TEXT, 
-        amount REAL)"""
-    )
-    # insert the extracted data into the database
-    for data in extract_data:
-        cursor.execute(
-            "INSERT INTO expenses (file_name, posting_date, purchase_date, description, amount) VALUES (?, ?, ?, ?, ?)",
-            (name, data["posting_date"], data["purchase_date"], data["description"], data["amount"]),
-        )
-    conn.commit()
+    # drop the table if it exists
+    conn.execute("DROP TABLE IF EXISTS expenses")
+    all_data.to_sql("expenses", conn, if_exists="replace", index=False)
     conn.close()
+    print("Data stored in the database")
 
-# define a function to insert a column expense type into the database
-def additional_columns(expense_type):
-    import sqlite3
-    conn = sqlite3.connect(database_path)
-    cursor = conn.cursor()
-    cursor.execute("ALTER TABLE expenses ADD COLUMN expense_type TEXT")
-    cursor.execute("UPDATE expenses SET expense_type = ?", (expense_type,))
-    conn.commit()
-    conn.close()
-
-def check_database() -> None:
-
-    import sqlite3
-    # check the database for the extracted data
+    # check the data stored in the database
     conn = sqlite3.connect(database_path)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM expenses")
-    for row in cursor.fetchall():
-        print(row)
+    print(cursor.fetchall())
+    conn.close()
+def check_data_in_database(database_path):
+    conn = sqlite3.connect(database_path)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM expenses")
+    print(cursor.fetchall())
     conn.close()
 
-
 def main() -> None:
-    # extract the file_name from the path file_path
-    file_name = os.path.basename(file_path)
-    # extract the name  from the file_name without the extension
-    name = os.path.splitext(file_name)[0]
+    expenses_dir = os.path.join(os.path.dirname(__file__), "cc")  
+    database_path = os.path.join(os.path.dirname(__file__), "expenses.db")
+    # cycle thorugh all the pdf files in the file_path folder
+    print(f"Extracting data from the pdf files in folder \n{expenses_dir}")
+    all_data = cycle_through_files(expenses_dir)
 
-    all_strings = extract_data_from_pdf(file_path)        
-    processed_data = process_data(all_strings)
-    extract_data = extract_expense( processed_data)
-    insert_data_to_database(name, extract_data)
-    check_database()
+    
+    store_data_in_database(all_data, database_path)
+    # check_data_in_database(database_path)
+
 
 
 if __name__ == "__main__":
