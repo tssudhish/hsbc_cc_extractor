@@ -1,7 +1,7 @@
 {
     "expense_type" :[
         {
-            "string_pattern": ["elior", "costa", "starbucks", "caffe", "nescafe", "dolcegusto", "tassimo", "illy", "lavazza", "senseo", "dallmayr", "jacobs", "melitta", "movenpick", "segafredo"],
+            "string_pattern": ["elior", "elior@airbus", "cafe", "costa", "lavazza", "starbucks" ],
             "type": "coffee"
         },
         {
@@ -9,11 +9,11 @@
             "type": "eatout"
         },
         {
-            "string_pattern": ["tesco", "sainsburys", "asda", "morrisons", "waitrose", "marksandspencer", "aldi", "lidl", "iceland", "coop", "spar", "costcutter", "mace", "nisa", "premier", "bestone", "onestop", "onestopshop", "onestopstores"],
+            "string_pattern": ["family shopper","tesco", "sainsburys", "asda", "morrisons", "waitrose", "marksandspencer", "aldi", "lidl", "iceland", "coop", "spar", "costcutter", "mace", "nisa", "premier", "bestone", "onestop", "onestopshop", "onestopstores"],
             "type": "grocery"
         },
         {
-            "string_pattern": ["geniepoint", "instavolt"],
+            "string_pattern": ["Charging", "geniepoint", "instavolt", "CHARGEPOINT", "BP", "BP PULSAR", "BP PULSE", "BP PULSE CHARGE", "BP PULSE CHARGING"],
             "type": "ev"
         },
         {
@@ -21,16 +21,50 @@
             "type": "pub"
         },
         {
-            "string_pattern": ["netflix", "spotify", "audible", "amazonprime", "disneyplus", "nowtv", "hulu", "hbo", "apple", "youtube", "vimeo", "twitch", "dazn", "nfl", "nba", "mlb", "nhl", "ufc", "wwe", "f1", "motogp", "nascar", "indycar", "espn", "sky", "bt", "virgin", "talktalk", "plusnet", "vodafone", "o2", "ee", "three", "giffgaff", "tescomobile", "asda", "lycamobile", "lebara", "idmobile", "smarty", "voxi", "skybet", "bet365", "williamhill", "ladbrokes", "coral", "paddypower", "betfred", "betfair", "betvictor", "unibet", "888sport", "betway", "mansionbet", "sportingbet", "bwin", "betdaq", "betbright", "betstars", "betmclean"],
+            "string_pattern": ["netflix", "spotify", "audible", "amazonprime", "disneyplus", "nowtv", "hulu", "hbo", "apple", "youtube", "vimeo", "twitch", "dazn", "nfl", "nba", "mlb", "nhl", "ufc", "wwe", "f1", "motogp", "nascar", "indycar", "espn", "sky", "bt", "virgin"],
             "type": "streaming"
         },
         {
-            "string_pattern": ["cineworld", "vue", "odeon", "empire", "picturehouse", "showcase", "everyman", "curzon"],
+            "string_pattern": [ "talktalk", "plusnet", "vodafone", "o2", "ee", "giffgaff", "tescomobile", "asda", "lycamobile", "lebara", "idmobile", "smarty", "voxi"],
+            "type": "mobile"
+        },
+
+        {
+            "string_pattern": [ "skybet", "bet365", "williamhill", "ladbrokes", "coral", "paddypower", "betfred", "betfair", "betvictor", "unibet", "888sport", "betway", "mansionbet", "sportingbet", "bwin", "betdaq", "betbright", "betstars", "betmclean"],
+            "type": "betting"
+        },
+        {
+            "string_pattern": ["movie","cinema", "cineworld", "vue", "odeon", "empire", "picturehouse", "showcase", "everyman", "curzon"],
             "type": "cinema"
         },
         {
-            "string_pattern": ["amazon", "ebay", "etsy", "asos", "zalando", "boohoo", "missguided", "prettylittlething", "shein", "nastygal", "fashionnova", "revolve", "farfetch", "netaporter", "matchesfashion", "mytheresa", "luisaviaroma", "bergdorfgoodman", "saksfifthavenue", "neimanmarcus", "barneys", "harrods", "selfridges", "johnlewis", "marksandspencer", "debenhams", "houseoffraser", "next", "riverisland", "topshop", "zara", "hm", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bers"],
+            "string_pattern": ["theworks","amznmktplace", "max spielmann","amazon", "ebay", "etsy", "asos", "zalando", "boohoo", "missguided", "prettylittlething", "shein", "nastygal", "fashionnova", "revolve", "farfetch", "netaporter", "matchesfashion", "mytheresa", "luisaviaroma", "bergdorfgoodman", "saksfifthavenue", "neimanmarcus", "barneys", "harrods", "selfridges", "johnlewis", "marksandspencer", "debenhams", "houseoffraser", "next", "riverisland", "topshop", "zara", "hm", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bershka", "massimodutti", "oysho", "uterque", "zara", "mango", "pullandbear", "stradivarius", "bers"],
             "type": "shopping"
+        },
+    
+        {
+            "string_pattern": ["tlscontact"],
+            "type": "passport"
+        },
+    
+        {
+            "string_pattern": ["TFL", "VICTORIA", "National Express", "megabus", "gwr", "railway", "trainline", "train", "transport"],
+            "type": "travel"
+        },
+    
+        {
+            "string_pattern": ["SOUTH GLOUCESTERSHIRE", "SOUTH GLOS", "SOUTH GLOUCESTERSHIRE COUNCIL", "SOUTH GLOS COUNCIL", "SOUTH GLOUCESTERSHIRE COUNCIL TAX", "SOUTH GLOS COUNCIL TAX"],
+            "type": "council"
+        },
+    
+        {
+            "string_pattern": ["Car Park", "NCP", "RINGO", "PAYBYPhone"],
+            "type": "parking"
+        },
+        
+        {
+            "string_pattern": ["CASTLE", "RESORT"],
+            "type": "tourism"
         }
     ]
 }

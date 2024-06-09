@@ -16,7 +16,7 @@ logger.addHandler(logging.StreamHandler())
 file_handler.setLevel(logging.DEBUG)
 logger.handlers[1].setLevel(logging.INFO)
 # set log level to debug for the logger
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 '''
 Code definitions
@@ -152,12 +152,47 @@ def store_common_descriptions(all_data):
     common_descriptions.columns = ["description", "frequency"]
     common_descriptions.to_pickle(os.path.join(os.path.dirname(__file__), "common_descriptions.pkl"))
     logger.info("Common descriptions stored in the pickle file")
-    logger.debug(common_descriptions.to_string())
+    # logger.debug(common_descriptions.to_string())
     return common_descriptions
+
+def check_if_pattern_in_description(description, pattern):
+    logger.debug(f"Checking if pattern {pattern} is in description {description.lower()}: {re.search(pattern, description, re.IGNORECASE)}")
+    return re.search(pattern, description, re.IGNORECASE) is not None
+
+
+
+def set_expense_type(expense_type_file, all_data):
+    # read the file expense_type.json from the src folder into expense_type dictionary
+    expense_type_data = pd.read_json(expense_type_file, typ="series").to_dict()
+    logger.debug(expense_type_data)
+
+    # cycle through the expense_type list for each type and check if for a given type the corresponding string_pattern is in the description column of all_data dataframe["description"]. If it is, add the type to the type column of all_data dataframe["type"]
+    for expense_type in expense_type_data["expense_type"]:
+        logger.info(f"Checking expense type {expense_type['type']}") 
+        for pattern in expense_type["string_pattern"]:
+            logger.debug(f"Checking pattern {pattern} to insert type {expense_type['type']}")
+            for index, row in all_data.iterrows():
+                if check_if_pattern_in_description(row["description"], pattern):
+                    all_data.at[index, "type"] = expense_type['type']
+    # for any type which is NaN set it to "other"
+    all_data["type"].fillna("other", inplace=True)
+
+    # # for each stringe pattern in the expense_type dictionary, check if the pattern is in the all_data dataframe and if it is, add the corresponding "type" to the dataframe
+    # expense_type_list =  expense_type_data["expense_type"]
+    # for expense_type in expense_type_list:
+    #     for pattern in expense_type["string_pattern"]:
+    #         logger.debug(f"Checking pattern {pattern} to insert type {expense_type['type']}")
+    #         # for each pattern check in all_data["description"] if the pattern is in the description column and if it is, append to type column list the corresponding type 
+    #         all_data["type"] = all_data["description"].apply(lambda x: expense_type["type"] if pattern in x else None)
+    # # for any type which is NaN set it to "other"
+    # all_data["type"].fillna("other", inplace=True)
+    return all_data
+
 
 def main() -> None:
     expenses_dir = os.path.join(os.path.dirname(__file__), "..", "cc")  
     database_path = os.path.join(os.path.dirname(__file__), "expenses.db")
+    expense_type_file = os.path.join(os.path.dirname(__file__), "expense_type.json")
     # cycle thorugh all the pdf files in the file_path folder
     logger.info(f"Extracting data from the pdf files in folder \n{expenses_dir}")
     all_data = cycle_through_files(expenses_dir)
@@ -171,9 +206,10 @@ def main() -> None:
 
     # load the pickle file into the all_data dataframe
     all_data = pd.read_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
-    common_patterns = store_common_patterns(all_data)
-    common_descriptions = store_common_descriptions(all_data)
-
+    all_data = set_expense_type(expense_type_file, all_data)
+    # common_patterns = store_common_patterns(all_data)
+    # common_descriptions = store_common_descriptions(all_data)
+    logger.info(all_data.to_string())
 
 if __name__ == "__main__":
     main()
