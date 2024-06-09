@@ -28,7 +28,7 @@ run the code `python main.py`
 To extract expenses from the credit card statements in the PDF file, the following pattern is checked from the statement:
 
 ```markdown
-| posting_date | transaction_date | description | amount |
+| posting_date | purchase_date | description | amount |
 |--------------|------------------|-------------|--------|
 |              |                  |             |        |
 |              |                  |             |        |
@@ -48,3 +48,4 @@ The following modules are used in the code:
 - `argparse`: Used for parsing command-line arguments.
 - `logging`: Used for logging messages during the execution of the code.
 - `sys`: Used for interacting with the Python interpreter.
+- `sqlite3`: temporarily used to create sql database for the same information.
