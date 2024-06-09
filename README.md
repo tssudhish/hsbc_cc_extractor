@@ -49,3 +49,6 @@ The following modules are used in the code:
 - `logging`: Used for logging messages during the execution of the code.
 - `sys`: Used for interacting with the Python interpreter.
 - `sqlite3`: temporarily used to create sql database for the same information.
+- `matplotlib`: Used for creating visualizations and plots.
+- `json`: Used for working with JSON data.
+
