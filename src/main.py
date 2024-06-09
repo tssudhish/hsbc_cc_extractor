@@ -73,17 +73,22 @@ def create_bar_chart(all_data):
     plt.show()
         
 # create expenses chart by month
-def create_expenses_chart_by_month(all_data):
+def create_expenses_chart_by_month(all_data, list_of_ignore_types=["office_travel"], number_of_months=6):
     # create a new column month from the posting_date column
     all_data["month"] = pd.to_datetime(all_data["posting_date"]).dt.to_period("M")
     # create a bar chart for total expenses by month
-    total_expenses = all_data[all_data["type"] != "office_travel"].groupby("month")["amount"].sum()
+    # calculate the total expenses by month ignoring the types in the list_of_ignore_types
+    total_expenses = all_data[~all_data["type"].isin(list_of_ignore_types)].groupby("month")["amount"].sum()
+    
     total_expenses = total_expenses.reset_index()
     # add average column to the total_expenses dataframe
     total_expenses["average"] = total_expenses["amount"].mean()
 
     logger.debug(f"total_expenses: {total_expenses.to_string()}, type: {type(total_expenses)}")
-    # average_expenses = all_data[all_data["type"] != "office_travel"].groupby("month")["amount"].mean()
+    # create a bar chart for total expenses by month for only the last number_of_months
+    if any([number_of_months > len(total_expenses), number_of_months == 0]):
+        number_of_months = len(total_expenses)
+    total_expenses = total_expenses.tail(number_of_months)
     total_expenses["amount"].plot(kind="bar",title="Total expenses by month")
     total_expenses["average"].plot(secondary_y=True, color="red", marker=".", linewidth=2)
     # plt.ylabel("Average amount")
@@ -272,31 +277,31 @@ def set_expense_type(expense_type_file, all_data):
 
 def main() -> None:
     expenses_dir = os.path.join(os.path.dirname(__file__), "..", "cc")  
-    # database_path = os.path.join(os.path.dirname(__file__), "expenses.db")
+    database_path = os.path.join(os.path.dirname(__file__), "expenses.db")
     expense_type_file = os.path.join(os.path.dirname(__file__), "expense_type.json")
     # cycle thorugh all the pdf files in the file_path folder
-    # logger.info(f"Extracting data from the pdf files in folder \n{expenses_dir}")
-    # all_data = cycle_through_files(expenses_dir)
+    logger.info(f"Extracting data from the pdf files in folder \n{expenses_dir}")
+    all_data = cycle_through_files(expenses_dir)
 
     # # store the all_data dataframe in a pickle file
-    # all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
+    all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
 
     # store the all_data dataframe in a database
-    # store_data_in_database(all_data, database_path)
-    # check_data_in_database(database_path)
+    store_data_in_database(all_data, database_path)
+    check_data_in_database(database_path)
 
     # load the pickle file into the all_data dataframe
-    # all_data = pd.read_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
-    # all_data = set_expense_type(expense_type_file, all_data)
-    # all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
+    all_data = pd.read_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
+    all_data = set_expense_type(expense_type_file, all_data)
+    all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
 
     all_data = pd.read_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
 
-    # common_patterns = store_common_patterns(all_data)
-    # common_descriptions = store_common_descriptions(all_data)
+    common_patterns = store_common_patterns(all_data)
+    common_descriptions = store_common_descriptions(all_data)
     create_pie_chart(all_data)
     create_bar_chart(all_data)
-    create_expenses_chart_by_month(all_data)
+    create_expenses_chart_by_month(all_data, ["None"])
 
     #logger.info(all_data.to_string())
 
