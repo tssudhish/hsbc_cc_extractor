@@ -5,13 +5,26 @@ import sqlite3
 import pandas as pd
 import re
 
+#add logging
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+file_handler = logging.FileHandler(os.path.join(os.path.dirname(__file__),"expense_runner.log"))
+logger.addHandler(file_handler)
+logger.addHandler(logging.StreamHandler())
+# set logger level to debug for lof file, and info for console
+file_handler.setLevel(logging.DEBUG)
+logger.handlers[1].setLevel(logging.INFO)
+# set log level to debug for the logger
+logger.setLevel(logging.DEBUG)
+
 '''
 Code definitions
 '''
 
 # define a function to extract data from the pdf file
 def extract_data_from_pdf (file_path):
-    print(f"Extracting data from the pdf file {file_path}")
+    logger.info(f"Extracting data from the pdf file {file_path}")
     all_strings = []
     with open(file_path, "rb") as fd:
         doc = PDFDocument(fd)
@@ -96,6 +109,10 @@ def cycle_through_files(expenses_dir):
         df = create_dataframe(extract_data)
         # add the name column to the dataframe df
         df["name"] = name
+
+        # log the dataframe to the log file
+        #logger.debug(df.to_string())
+
         all_data = join_dataframes(all_data, df)
     return all_data
 
@@ -105,32 +122,57 @@ def store_data_in_database(all_data, database_path):
     conn.execute("DROP TABLE IF EXISTS expenses")
     all_data.to_sql("expenses", conn, if_exists="replace", index=False)
     conn.close()
-    print("Data stored in the database")
-
-    # check the data stored in the database
-    conn = sqlite3.connect(database_path)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM expenses")
-    print(cursor.fetchall())
-    conn.close()
+    logger.info("Data stored in the database")
+    
 def check_data_in_database(database_path):
     conn = sqlite3.connect(database_path)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM expenses")
-    print(cursor.fetchall())
+    # log info the number of data in the database
+    logger.info(f"Number of data in the database: {len(cursor.fetchall())}")
+    logger.debug(cursor.description)
+    logger.debug(cursor.fetchall())
     conn.close()
 
+def store_common_patterns(all_data):
+    # store the common patterns in  all_data dataframe for column description in a dataframe for whole words and store the number of occurences in additional column called frequency
+    all_data["description"] = all_data["description"].str.lower()
+    common_patterns = all_data["description"].str.split(expand=True).stack().value_counts()
+    common_patterns = common_patterns[common_patterns > 1]
+    common_patterns = common_patterns.reset_index()
+    common_patterns.columns = ["pattern", "frequency"]
+    common_patterns.to_pickle(os.path.join(os.path.dirname(__file__), "common_patterns.pkl"))
+    logger.info("Common patterns stored in the pickle file")
+    logger.debug(common_patterns.to_string())
+    return common_patterns
+
+def store_common_descriptions(all_data):
+    # store the common descriptions in the all_data dataframe for column description in a dataframe and store the number of occurences in additional column called frequency
+    common_descriptions = all_data["description"].value_counts().reset_index()
+    common_descriptions.columns = ["description", "frequency"]
+    common_descriptions.to_pickle(os.path.join(os.path.dirname(__file__), "common_descriptions.pkl"))
+    logger.info("Common descriptions stored in the pickle file")
+    logger.debug(common_descriptions.to_string())
+    return common_descriptions
+
 def main() -> None:
-    expenses_dir = os.path.join(os.path.dirname(__file__), "cc")  
+    expenses_dir = os.path.join(os.path.dirname(__file__), "..", "cc")  
     database_path = os.path.join(os.path.dirname(__file__), "expenses.db")
     # cycle thorugh all the pdf files in the file_path folder
-    print(f"Extracting data from the pdf files in folder \n{expenses_dir}")
+    logger.info(f"Extracting data from the pdf files in folder \n{expenses_dir}")
     all_data = cycle_through_files(expenses_dir)
 
-    
-    store_data_in_database(all_data, database_path)
-    # check_data_in_database(database_path)
+    # store the all_data dataframe in a pickle file
+    all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
 
+    # store the all_data dataframe in a database
+    store_data_in_database(all_data, database_path)
+    check_data_in_database(database_path)
+
+    # load the pickle file into the all_data dataframe
+    all_data = pd.read_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
+    common_patterns = store_common_patterns(all_data)
+    common_descriptions = store_common_descriptions(all_data)
 
 
 if __name__ == "__main__":
