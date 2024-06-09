@@ -23,7 +23,7 @@ logger.addHandler(logging.StreamHandler())
 file_handler.setLevel(logging.DEBUG)
 logger.handlers[1].setLevel(logging.INFO)
 # set log level to debug for the logger
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 '''
 Code definitions
@@ -49,7 +49,7 @@ def create_pie_chart(all_data):
     # show the values along with the pie chart
    
     plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_type.png"))
-    plt.show()
+    #plt.show()
 
     total_expenses = all_data[all_data["type"] != "office_travel"].groupby("type")["amount"].sum()
     
@@ -62,7 +62,7 @@ def create_pie_chart(all_data):
     # show the values along with the pie chart
    
     plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_type.png"))
-    plt.show()
+    #plt.show()
 
 def create_bar_chart(all_data):
     # create bar chart for total expenses by type
@@ -70,7 +70,7 @@ def create_bar_chart(all_data):
     total_expenses.plot.bar(title="Total expenses by type")
     plt.ylabel("Amount")
     plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_type.png"))
-    plt.show()
+    #plt.show()
         
 # create expenses chart by month
 def create_expenses_chart_by_month(all_data, list_of_ignore_types=["office_travel"], number_of_months=6):
@@ -90,10 +90,10 @@ def create_expenses_chart_by_month(all_data, list_of_ignore_types=["office_trave
         number_of_months = len(total_expenses)
     total_expenses = total_expenses.tail(number_of_months)
     total_expenses["amount"].plot(kind="bar",title="Total expenses by month")
-    total_expenses["average"].plot(secondary_y=True, color="red", marker=".", linewidth=2)
-    # plt.ylabel("Average amount")
+    total_expenses["average"].plot(secondary_y=True, color="blue", marker=".", linewidth=2)
+    plt.ylabel("Average amount")
     plt.ylabel("Amount")
-    plt.show()
+    #plt.show()
     # plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_month.png"))
 
 
@@ -301,7 +301,7 @@ def main() -> None:
     common_descriptions = store_common_descriptions(all_data)
     create_pie_chart(all_data)
     create_bar_chart(all_data)
-    create_expenses_chart_by_month(all_data, ["None"])
+    create_expenses_chart_by_month(all_data, ["None"],0)
 
     #logger.info(all_data.to_string())
 

@@ -52,7 +52,16 @@
                 "TAPAS",
                 "ITSU",
                 "The Blue Lagoon",
-                "Wagamama"
+                "Wagamama",
+                "GREGGS",
+                "Adyar Ananda",
+                "JUSTEATCOUK",
+                "kebabs",
+                "mayflower",
+                "pappu dosa",
+                "chandos",
+                "krispy kreme",
+                "revolution"
             ],
             "type": "eatout"
         },
@@ -82,7 +91,14 @@
                 "Costco",
                 "MILKMAN",
                 "CAKE",
-                "SAKTHI"
+                "SAKTHI",
+                "CO-OP",
+                "FARMFOODS",
+                "eden general stores",
+                "wilko",
+                "convenience",
+                "redwood farm",
+                "martin mccoll"
             ],
             "type": "grocery"
         },
@@ -104,7 +120,8 @@
                 "GRIDSERVE",
                 "PLUGSURFING",
                 "ELECTRICA",
-                "PAYATPUMP"
+                "PAYATPUMP",
+                "POD POINT"
             ],
             "type": "ev_or_fuel"
         },
@@ -133,7 +150,12 @@
                 "sofamasters",
                 "sofamax",
                 "SCREWFIX",
-                "WAYFAIR"
+                "WAYFAIR",
+                "HALFORDS",
+                "Dyson Limited",
+                "zhongchuang",
+                "cshorler",
+                "giant"
             ],
             "type": "furniture_or_electronics_or_home_improvement"
         },
@@ -153,7 +175,12 @@
                 "THE GLOUCESTER OLD",
                 "THE CRAFTY COW",
                 "BAILEY'S COURT INN",
-                "Hobgoblin"
+                "Hobgoblin",
+                "The Globe",
+                "THE COTTAGE INN",
+                "WETHERSPOON",
+                "THE BOWL INN",
+                "aztec hotel"
             ],
             "type": "pub"
         },
@@ -185,7 +212,8 @@
                 "espn",
                 "sky",
                 "bt",
-                "virgin"
+                "virgin",
+                "GITHUB"
             ],
             "type": "streaming"
         },
@@ -379,9 +407,18 @@
                 "WH Smith",
                 "BRADLEY STOKE LEISURE",
                 "PETS AT HOME",
-                "SPORTSDIRECT"
+                "SPORTSDIRECT",
+                "SWIFT SPORTS",
+                "ALIBRIS BOOKS",
+                "INK FACTORY",
+                "CYCLESCHEME",
+                "reflections",
+                "photo me",
+                "little stoke community",
+                "roman camp service",
+                "smiggle"
             ],
-            "type": "school_or_for_kids"
+            "type": "school_or_for_kids_or_haircut_etc"
         },
         {
             "string_pattern": [
@@ -399,7 +436,8 @@
                 "NATIONALEXP",
                 "FIRST BUS",
                 "Travelup",
-                "FIRST BRISTOL BUSES"
+                "FIRST BRISTOL BUSES",
+                "ticketline"
             ],
             "type": "travel"
         },
@@ -421,7 +459,9 @@
                 "RINGO",
                 "RINGGO",
                 "PAYBYPhone",
-                "CAR WASH"
+                "CAR WASH",
+                "PARKING",
+                "park with"
             ],
             "type": "parking"
         },
@@ -470,7 +510,18 @@
                 "Morpeth",
                 "AMBLESIDE",
                 "KESWICK",
-                "WORCESTER"
+                "WORCESTER",
+                "WESTON-S-MARE",
+                "Abergavenny",
+                "DOVER",
+                "Ryde",
+                "gwynedd",
+                "llandudno",
+                "weston super",
+                "hartlebury",
+                "lake district",
+                "christchurch",
+                "manchester"
             ],
             "type": "tourism"
         },
@@ -488,7 +539,9 @@
                 "M&S",
                 "H & M",
                 "H&M",
-                "JOHN LEWIS"
+                "JOHN LEWIS",
+                "MNSSTORE",
+                "MARKS & SPENCER "
             ],
             "type": "clothing"
         },
@@ -510,14 +563,15 @@
                 "IND",
                 "STEVENAGE",
                 "READING",
-                "DOVER",
                 "HYTHE",
                 "RYANAIR",
                 "EASYJET",
                 "ESP",
                 "Windsor",
                 "NLD",
-                "UKVI"
+                "UKVI",
+                "HEATHROW",
+                "st george"
             ],
             "type": "office_travel"
         },
@@ -670,7 +724,8 @@
         {
             "string_pattern": [
                 "SGBVS",
-                "CAR"
+                "CAR",
+                "AUTO TRADER"
             ],
             "type": "car_related"
         }
