@@ -68,6 +68,8 @@ def create_bar_chart(all_data):
     # create bar chart for total expenses by type
     total_expenses = all_data[all_data["type"] != "office_travel"].groupby("type")["amount"].sum()
     total_expenses.plot.bar(title="Total expenses by type")
+    logger.info(f"total_expenses: {total_expenses.to_string()}, type: {type(total_expenses)}")
+    plt.title("Total expenses by type")
     plt.ylabel("Amount")
     plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_type.png"))
     plt.show()
@@ -84,7 +86,7 @@ def create_expenses_chart_by_month(all_data, list_of_ignore_types=["office_trave
     # add average column to the total_expenses dataframe
     total_expenses["average"] = total_expenses["amount"].mean()
 
-    logger.debug(f"total_expenses: {total_expenses.to_string()}, type: {type(total_expenses)}")
+    logger.info(f"total_expenses: {total_expenses.to_string()}, type: {type(total_expenses)}")
     # create a bar chart for total expenses by month for only the last number_of_months
     if any([number_of_months > len(total_expenses), number_of_months == 0]):
         number_of_months = len(total_expenses)
