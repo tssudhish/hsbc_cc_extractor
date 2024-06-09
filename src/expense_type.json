@@ -61,7 +61,8 @@
                 "pappu dosa",
                 "chandos",
                 "krispy kreme",
-                "revolution"
+                "revolution",
+                "id-7547120"
             ],
             "type": "eatout"
         },
@@ -98,7 +99,11 @@
                 "wilko",
                 "convenience",
                 "redwood farm",
-                "martin mccoll"
+                "martin mccoll",
+                "b&m",
+                "b & m",
+                "homebargains",
+                "home bargains"
             ],
             "type": "grocery"
         },
@@ -180,7 +185,8 @@
                 "THE COTTAGE INN",
                 "WETHERSPOON",
                 "THE BOWL INN",
-                "aztec hotel"
+                "aztec hotel",
+                "flyer"
             ],
             "type": "pub"
         },
@@ -213,7 +219,8 @@
                 "sky",
                 "bt",
                 "virgin",
-                "GITHUB"
+                "GITHUB",
+                "google storage"
             ],
             "type": "streaming"
         },
@@ -416,7 +423,13 @@
                 "photo me",
                 "little stoke community",
                 "roman camp service",
-                "smiggle"
+                "smiggle",
+                "oprointerna",
+                "rss stoke brook",
+                "gohenry",
+                "www.better.org.uk",
+                "easysim",
+                "cauliflower_group"
             ],
             "type": "school_or_for_kids_or_haircut_etc"
         },
@@ -521,7 +534,8 @@
                 "hartlebury",
                 "lake district",
                 "christchurch",
-                "manchester"
+                "manchester",
+                "colchester"
             ],
             "type": "tourism"
         },
@@ -541,7 +555,9 @@
                 "H&M",
                 "JOHN LEWIS",
                 "MNSSTORE",
-                "MARKS & SPENCER "
+                "MARKS & SPENCER ",
+                "charles clinkard",
+                "soletrader"
             ],
             "type": "clothing"
         },
@@ -571,7 +587,9 @@
                 "NLD",
                 "UKVI",
                 "HEATHROW",
-                "st george"
+                "st george",
+                "gatwick",
+                "airport"
             ],
             "type": "office_travel"
         },
