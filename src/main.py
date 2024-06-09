@@ -4,6 +4,13 @@ from pdfreader import PDFDocument, SimplePDFViewer
 import sqlite3
 import pandas as pd
 import re
+import matplotlib.pyplot as plt
+import json
+
+# set the working directory to the src folder
+os.chdir(os.path.dirname(__file__))
+# set the matplotlib style to ggplot
+plt.style.use("ggplot")
 
 #add logging
 import logging
@@ -16,11 +23,84 @@ logger.addHandler(logging.StreamHandler())
 file_handler.setLevel(logging.DEBUG)
 logger.handlers[1].setLevel(logging.INFO)
 # set log level to debug for the logger
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 '''
 Code definitions
 '''
+
+def autopct_format(values):
+    def my_format(pct):
+        total = sum(values)
+        val = int(round(pct*total/100.0))
+        return '{v:d}'.format(v=val)
+    return my_format
+
+# create the pie chart for total expenses by type from all_data dataframe
+def create_pie_chart(all_data):
+    # create a pie chart for values for total expenses by type ignoring the type office_travel
+    total_expenses = all_data[all_data["type"] != "office_travel"].groupby("type")["amount"].sum()
+    total_expenses.plot.pie( autopct=autopct_format(total_expenses), 
+                                startangle=90, 
+                                counterclock=False, 
+                                title="Total expenses by type",
+                                figsize=(10, 10))
+    plt.title("Total expenses by type")
+    # show the values along with the pie chart
+   
+    plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_type.png"))
+    plt.show()
+
+    total_expenses = all_data[all_data["type"] != "office_travel"].groupby("type")["amount"].sum()
+    
+    total_expenses.plot.pie(autopct='%1.1f%%', 
+                            startangle=90, 
+                            counterclock=False, 
+                            title="Total expenses by type",
+                            figsize=(10, 10))
+    plt.title("Total expenses by type")
+    # show the values along with the pie chart
+   
+    plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_type.png"))
+    plt.show()
+
+def create_bar_chart(all_data):
+    # create bar chart for total expenses by type
+    total_expenses = all_data[all_data["type"] != "office_travel"].groupby("type")["amount"].sum()
+    total_expenses.plot.bar(title="Total expenses by type")
+    plt.ylabel("Amount")
+    plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_type.png"))
+    plt.show()
+        
+# create expenses chart by month
+def create_expenses_chart_by_month(all_data):
+    # create a new column month from the posting_date column
+    all_data["month"] = pd.to_datetime(all_data["posting_date"]).dt.to_period("M")
+    # create a bar chart for total expenses by month
+    total_expenses = all_data[all_data["type"] != "office_travel"].groupby("month")["amount"].sum()
+    total_expenses = total_expenses.reset_index()
+    # add average column to the total_expenses dataframe
+    total_expenses["average"] = total_expenses["amount"].mean()
+
+    logger.debug(f"total_expenses: {total_expenses.to_string()}, type: {type(total_expenses)}")
+    # average_expenses = all_data[all_data["type"] != "office_travel"].groupby("month")["amount"].mean()
+    total_expenses["amount"].plot(kind="bar",title="Total expenses by month")
+    total_expenses["average"].plot(secondary_y=True, color="red", marker=".", linewidth=2)
+    # plt.ylabel("Average amount")
+    plt.ylabel("Amount")
+    plt.show()
+    # plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_month.png"))
+
+
+
+
+
+    plt.show()
+
+
+    
+
+
 
 # define a function to extract data from the pdf file
 def extract_data_from_pdf (file_path):
@@ -75,7 +155,8 @@ def extract_expense(processed_data):
         # convert the posting_date and purchase_date to a standard format
         posting_date = re.sub(r"(\d{2}) ([A-Z][a-z]{2}) (\d{2})", r"\1-\2-20\3", posting_date)
         purchase_date = re.sub(r"(\d{2}) ([A-Z][a-z]{2}) (\d{2})", r"\1-\2-20\3", purchase_date)
-        
+        # convert the amount to a float
+        amount = float(amount)
         expense_data.append({"posting_date" : posting_date, 
                              "purchase_date" : purchase_date, 
                              "description" : description, 
@@ -163,7 +244,9 @@ def check_if_pattern_in_description(description, pattern):
 
 def set_expense_type(expense_type_file, all_data):
     # read the file expense_type.json from the src folder into expense_type dictionary
-    expense_type_data = pd.read_json(expense_type_file, typ="series").to_dict()
+   
+    with open(expense_type_file, "r", encoding="utf-8") as f:
+        expense_type_data = json.load(f)
     logger.debug(expense_type_data)
 
     # cycle through the expense_type list for each type and check if for a given type the corresponding string_pattern is in the description column of all_data dataframe["description"]. If it is, add the type to the type column of all_data dataframe["type"]
@@ -174,42 +257,51 @@ def set_expense_type(expense_type_file, all_data):
             for index, row in all_data.iterrows():
                 if check_if_pattern_in_description(row["description"], pattern):
                     all_data.at[index, "type"] = expense_type['type']
+                    all_data.at[index, "detail"] = pattern
     # for any type which is NaN set it to "other"
     all_data["type"].fillna("other", inplace=True)
+    all_data["detail"].fillna("not_captured", inplace=True)
+    # drop all the rows with type credit
+    all_data = all_data[all_data["type"] != "credit"]
 
-    # # for each stringe pattern in the expense_type dictionary, check if the pattern is in the all_data dataframe and if it is, add the corresponding "type" to the dataframe
-    # expense_type_list =  expense_type_data["expense_type"]
-    # for expense_type in expense_type_list:
-    #     for pattern in expense_type["string_pattern"]:
-    #         logger.debug(f"Checking pattern {pattern} to insert type {expense_type['type']}")
-    #         # for each pattern check in all_data["description"] if the pattern is in the description column and if it is, append to type column list the corresponding type 
-    #         all_data["type"] = all_data["description"].apply(lambda x: expense_type["type"] if pattern in x else None)
-    # # for any type which is NaN set it to "other"
-    # all_data["type"].fillna("other", inplace=True)
     return all_data
+
+
+
 
 
 def main() -> None:
     expenses_dir = os.path.join(os.path.dirname(__file__), "..", "cc")  
-    database_path = os.path.join(os.path.dirname(__file__), "expenses.db")
+    # database_path = os.path.join(os.path.dirname(__file__), "expenses.db")
     expense_type_file = os.path.join(os.path.dirname(__file__), "expense_type.json")
     # cycle thorugh all the pdf files in the file_path folder
-    logger.info(f"Extracting data from the pdf files in folder \n{expenses_dir}")
-    all_data = cycle_through_files(expenses_dir)
+    # logger.info(f"Extracting data from the pdf files in folder \n{expenses_dir}")
+    # all_data = cycle_through_files(expenses_dir)
 
-    # store the all_data dataframe in a pickle file
-    all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
+    # # store the all_data dataframe in a pickle file
+    # all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
 
     # store the all_data dataframe in a database
-    store_data_in_database(all_data, database_path)
-    check_data_in_database(database_path)
+    # store_data_in_database(all_data, database_path)
+    # check_data_in_database(database_path)
 
     # load the pickle file into the all_data dataframe
+    # all_data = pd.read_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
+    # all_data = set_expense_type(expense_type_file, all_data)
+    # all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
+
     all_data = pd.read_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
-    all_data = set_expense_type(expense_type_file, all_data)
+
     # common_patterns = store_common_patterns(all_data)
     # common_descriptions = store_common_descriptions(all_data)
-    logger.info(all_data.to_string())
+    create_pie_chart(all_data)
+    create_bar_chart(all_data)
+    create_expenses_chart_by_month(all_data)
+
+    #logger.info(all_data.to_string())
+
+    # log the dataframe to the log file with type other
+    logger.info(all_data[all_data["type"] == "other"].to_string())
 
 if __name__ == "__main__":
     main()
