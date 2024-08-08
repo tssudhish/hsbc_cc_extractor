@@ -165,7 +165,8 @@
                 "cshorler",
                 "giant",
                 "landreguk",
-                "onlinelapto"
+                "onlinelapto",
+                "SOLY"
             ],
             "type": "furniture_or_electronics_or_home_improvement"
         },
@@ -175,6 +176,7 @@
                 "swan",
                 "threebrooks",
                 "brooks",
+                "THREE BROOKS",
                 "air balloon",
                 "inn on the green",
                 "arms",
@@ -191,7 +193,8 @@
                 "WETHERSPOON",
                 "THE BOWL INN",
                 "aztec hotel",
-                "flyer"
+                "flyer",
+                "hollow tree"
             ],
             "type": "pub"
         },
@@ -237,10 +240,8 @@
                 "plusnet",
                 "vodafone",
                 "o2",
-                "ee",
                 "giffgaff",
                 "tescomobile",
-                "asda",
                 "lycamobile",
                 "lebara",
                 "idmobile",

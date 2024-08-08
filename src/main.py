@@ -97,17 +97,7 @@ def create_expenses_chart_by_month(all_data, list_of_ignore_types=["office_trave
     plt.ylabel("Amount")
     plt.show()
     # plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_month.png"))
-
-
-
-
-
     plt.show()
-
-
-    
-
-
 
 # define a function to extract data from the pdf file
 def extract_data_from_pdf (file_path):
@@ -138,7 +128,7 @@ def process_data(all_strings):
 
     # remove all the lines that are not containing elements of dates
     combined_strings = "\n".join([line for line in combined_strings.split("\n") if any(date in line for date in dates)])
-
+    logger.debug(combined_strings)
     return combined_strings
 
 
@@ -149,25 +139,37 @@ def extract_expense(processed_data):
         #print(line)
         # use the pattern /(\d+\s\w*\s\d\d)\s(\d+\s\w*\s\d\d)\s(.*)\s(\d+[.]\d+)$/gm to extract posting date, purchase date, description and amount from line
         
-        pattern = (
-            r"(\d{2} [A-Z][a-z]{2} \d{2})\s"
-            r"(\d{2} [A-Z][a-z]{2} \d{2})\s"
-            r"(.*?)\s"
-            r"(\d+[.]\d+)"
-        )
+        pattern = (r"(\d{2} [A-Z][a-z]{2} \d{2})\s"
+                   r"(\d{2} [A-Z][a-z]{2} \d{2})\s"
+                   r"(.*?)\s"
+                   r"((\d{0,3}?,)*\d+[.]\d{2})"
+                   r"\s(.*)"
+                   )
+
         match = re.match(pattern, line)
         if match is None:
+            logger.debug(f"Line not matched: {line}")
             continue
-        posting_date, purchase_date, description, amount = match.groups()
+        # log the number of groups matched
+        # logger.debug(f"Number of groups matched: {len(match.groups())}")
+
+        posting_date, purchase_date, description, amount= match.groups()[0:4]
+        rem = match.groups()[-1]
         # convert the posting_date and purchase_date to a standard format
         posting_date = re.sub(r"(\d{2}) ([A-Z][a-z]{2}) (\d{2})", r"\1-\2-20\3", posting_date)
         purchase_date = re.sub(r"(\d{2}) ([A-Z][a-z]{2}) (\d{2})", r"\1-\2-20\3", purchase_date)
         # convert the amount to a float
-        amount = float(amount)
+        amount = float(amount.replace(',',''))
+
+        if rem.strip() == "C R":
+            continue
+
+
         expense_data.append({"posting_date" : posting_date, 
-                             "purchase_date" : purchase_date, 
+                              "purchase_date" : purchase_date, 
                              "description" : description, 
                              "amount" : amount})
+        # logger.info(f"Posting date: {posting_date}, Purchase date: {purchase_date}, Description: {description}, Amount: {amount}, remainder: {rem}")
     return expense_data
 
 # define a function to create a pandas dataframe from the extracted data
@@ -191,9 +193,11 @@ def cycle_through_files(expenses_dir):
         file_path = os.path.join(expenses_dir, file_name)
         # extract the name  from the file_name without the extension
         name = os.path.splitext(file_name)[0]
+
         all_strings = extract_data_from_pdf(file_path)        
         processed_data = process_data(all_strings)
         extract_data = extract_expense( processed_data)
+
         df = create_dataframe(extract_data)
         # add the name column to the dataframe df
         df["name"] = name
@@ -251,20 +255,29 @@ def check_if_pattern_in_description(description, pattern):
 
 def set_expense_type(expense_type_file, all_data):
     # read the file expense_type.json from the src folder into expense_type dictionary
-   
     with open(expense_type_file, "r", encoding="utf-8") as f:
         expense_type_data = json.load(f)
     logger.debug(expense_type_data)
 
-    # cycle through the expense_type list for each type and check if for a given type the corresponding string_pattern is in the description column of all_data dataframe["description"]. If it is, add the type to the type column of all_data dataframe["type"]
+
+    '''
+    Cycle through the expense_type list for each type and check 
+    if for a given type the corresponding string_pattern is in 
+    the description column of all_data dataframe["description"]. 
+    If it is, add the type to the type column of all_data dataframe["type"]
+    '''
+    all_data["type"] = None
+    all_data["detail"] = None
     for expense_type in expense_type_data["expense_type"]:
         logger.info(f"Checking expense type {expense_type['type']}") 
         for pattern in expense_type["string_pattern"]:
             logger.debug(f"Checking pattern {pattern} to insert type {expense_type['type']}")
             for index, row in all_data.iterrows():
                 if check_if_pattern_in_description(row["description"], pattern):
+                    # logger.info(f" Found {expense_type['type']} in {row['description']}")
                     all_data.at[index, "type"] = expense_type['type']
                     all_data.at[index, "detail"] = pattern
+
     # for any type which is NaN set it to "other"
     all_data["type"].fillna("other", inplace=True)
     all_data["detail"].fillna("not_captured", inplace=True)
@@ -285,6 +298,9 @@ def main() -> None:
     logger.info(f"Extracting data from the pdf files in folder \n{expenses_dir}")
     all_data = cycle_through_files(expenses_dir)
 
+    # log the dataframe to the log file
+    logger.info(all_data.to_string())
+
     # # store the all_data dataframe in a pickle file
     all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
 
@@ -297,8 +313,12 @@ def main() -> None:
     all_data = set_expense_type(expense_type_file, all_data)
     all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
 
-    all_data = pd.read_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
+    # store all_data to excel file
+    # all_data.to_excel(os.path.join(os.path.dirname(__file__), "all_data.xlsx"), index=False)
 
+
+    all_data = pd.read_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
+    
     common_patterns = store_common_patterns(all_data)
     common_descriptions = store_common_descriptions(all_data)
     create_pie_chart(all_data)
