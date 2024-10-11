@@ -45,6 +45,9 @@ def create_pie_chart(all_data):
                                 counterclock=False, 
                                 title="Total expenses by type",
                                 figsize=(10, 10))
+    # new plot
+
+
     plt.title("Total expenses by type")
     # show the values along with the pie chart
    
@@ -93,21 +96,14 @@ def create_expenses_chart_by_month(all_data, list_of_ignore_types=["office_trave
     total_expenses = total_expenses.tail(number_of_months)
     total_expenses["amount"].plot(kind="bar",title="Total expenses by month")
     total_expenses["average"].plot(secondary_y=True, color="blue", marker=".", linewidth=2)
+    # set the xticks to the month column
+    # plt.xticks(range(len(total_expenses)), total_expenses["month"].dt.strftime("%Y-%m"), rotation=90)
+
     plt.ylabel("Average amount")
     plt.ylabel("Amount")
     plt.show()
-    # plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_month.png"))
-
-
-
-
-
+    plt.savefig(os.path.join(os.path.dirname(__file__), "total_expenses_by_month.png"))
     plt.show()
-
-
-    
-
-
 
 # define a function to extract data from the pdf file
 def extract_data_from_pdf (file_path):
@@ -138,9 +134,7 @@ def process_data(all_strings):
 
     # remove all the lines that are not containing elements of dates
     combined_strings = "\n".join([line for line in combined_strings.split("\n") if any(date in line for date in dates)])
-
     return combined_strings
-
 
 def extract_expense(processed_data):
     expense_data = []
@@ -153,16 +147,18 @@ def extract_expense(processed_data):
             r"(\d{2} [A-Z][a-z]{2} \d{2})\s"
             r"(\d{2} [A-Z][a-z]{2} \d{2})\s"
             r"(.*?)\s"
-            r"(\d+[.]\d+)"
+            r"((\d+,)?\d+[.]\d+)"
         )
         match = re.match(pattern, line)
         if match is None:
+            logger.info(f"Line not matched: {line}")
             continue
-        posting_date, purchase_date, description, amount = match.groups()
+        posting_date, purchase_date, description, amount,_ = match.groups()
         # convert the posting_date and purchase_date to a standard format
         posting_date = re.sub(r"(\d{2}) ([A-Z][a-z]{2}) (\d{2})", r"\1-\2-20\3", posting_date)
         purchase_date = re.sub(r"(\d{2}) ([A-Z][a-z]{2}) (\d{2})", r"\1-\2-20\3", purchase_date)
         # convert the amount to a float
+        amount = amount.replace(",", "")
         amount = float(amount)
         expense_data.append({"posting_date" : posting_date, 
                              "purchase_date" : purchase_date, 
@@ -273,10 +269,6 @@ def set_expense_type(expense_type_file, all_data):
 
     return all_data
 
-
-
-
-
 def main() -> None:
     expenses_dir = os.path.join(os.path.dirname(__file__), "..", "cc")  
     database_path = os.path.join(os.path.dirname(__file__), "expenses.db")
@@ -298,6 +290,9 @@ def main() -> None:
     all_data.to_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
 
     all_data = pd.read_pickle(os.path.join(os.path.dirname(__file__), "all_data.pkl"))
+
+    # dump all_data into a text file
+    all_data.to_csv(os.path.join(os.path.dirname(__file__), "all_data.txt"), sep="\t")
 
     common_patterns = store_common_patterns(all_data)
     common_descriptions = store_common_descriptions(all_data)
