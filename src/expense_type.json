@@ -65,7 +65,12 @@
                 "revolution",
                 "id-7547120",
                 "trg plc",
-                "lamaya"
+                "lamaya",
+                "zettle_",
+                "Zanky",
+                "LE VIGNOBLE",
+                "Giuseppe",
+                "SURFSHARK"
             ],
             "type": "eatout"
         },
@@ -107,7 +112,8 @@
                 "b & m",
                 "homebargains",
                 "home bargains",
-                "member discounts"
+                "member discounts",
+                "PHARMACY"
             ],
             "type": "grocery"
         },
@@ -166,10 +172,18 @@
                 "cshorler",
                 "giant",
                 "landreguk",
-                "onlinelapto"
+                "onlinelapto"                
             ],
             "type": "furniture_or_electronics_or_home_improvement"
         },
+        {
+            "string_pattern":[
+                "soly",
+                "octopus"
+            ],
+            "type": "solar"
+         },
+
         {
             "string_pattern": [
                 "BOSCO",
@@ -192,7 +206,8 @@
                 "WETHERSPOON",
                 "THE BOWL INN",
                 "aztec hotel",
-                "flyer"
+                "flyer",
+                "boar's head"
             ],
             "type": "pub"
         },
@@ -226,9 +241,10 @@
                 "bt",
                 "virgin",
                 "GITHUB",
-                "google storage",
+                "google",
                 "snapwiseinc",
-                "prime video"
+                "prime video",
+                "WIKIPEDIA"
             ],
             "type": "streaming"
         },
@@ -395,7 +411,8 @@
                 "pullandbear",
                 "stradivarius",
                 "bers",
-                "TEMU"
+                "TEMU",
+                "shoe zone"
             ],
             "type": "shopping"
         },
@@ -441,7 +458,8 @@
                 "merlinattra",
                 "post office counter",
                 "codomoptelt",
-                "www.activecentres.org"
+                "www.activecentres.org",
+                "SCHOOLPHOTO"
             ],
             "type": "school_or_for_kids_or_haircut_etc"
         },
@@ -462,7 +480,8 @@
                 "FIRST BUS",
                 "Travelup",
                 "FIRST BRISTOL BUSES",
-                "ticketline"
+                "ticketline",
+                "emirates"
             ],
             "type": "travel"
         },
@@ -547,7 +566,11 @@
                 "lake district",
                 "christchurch",
                 "manchester",
-                "colchester"
+                "colchester",
+                "pen y cae",
+                "ystradgynlais",
+                "llanelli",
+                "plymouth"
             ],
             "type": "tourism"
         },
@@ -569,7 +592,8 @@
                 "MNSSTORE",
                 "MARKS & SPENCER ",
                 "charles clinkard",
-                "soletrader"
+                "soletrader",
+                "cribbs"
             ],
             "type": "clothing"
         },
